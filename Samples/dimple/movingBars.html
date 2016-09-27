@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  
+   
+      <link rel="stylesheet" type="text/css" href="../../css/defaultCSS.css">
+      <style>
+            body
+{
+    background: url("../../imgs/Backdrop.png") no-repeat center center fixed;<!--Make a seperate images folder-->
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+nav
+{
+    font-family: calibri;
+    font-size: 1.50em;
+    color: #FFFFFF;
+    background-color: rgba(12, 13, 2, 0.7);
+    
+    box-sizing: border-box;
+    padding:10px;
+     
+}
+
+ul
+{
+    list-style-type: none;
+     padding: 8px 16px;
+}
+
+li
+{
+    display: inline;
+   
+}
+
+li a 
+{
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+a:hover
+{
+    text-decoration:none;
+    color: #ffffff;
+}
+a.op1
+{
+      border-bottom: 2px solid #2FB8AC;
+}
+
+a:hover.op1
+{
+    background: #2FB8AC;
+}
+
+a:active.op1
+{
+    background: #2FB8AC;
+}
+
+a.op2
+{
+    border-bottom: 2px solid #B05574;
+}
+
+a:hover.op2
+{
+    background: #B05574;
+}
+
+a.op3
+{
+    background: #FD0A54;
+    border-bottom: 2px solid #FD0A54;
+}
+
+a:hover.op3
+{
+    background: #FD0A54;
+}
+
+a.op4
+{
+    border-bottom: 2px solid #F57576;
+}
+
+a:hover.op4
+{
+    background: #F57576;
+}
+            h2
+            {
+                    text-align: center;
+                    font-size: 1.25em;
+                    color: #d9edf7;
+                    padding: 20px;
+                    font-family: sans-serif;
+            }
+            path.dimple-line
+            {
+                stroke: #ddd;
+            }
+            svg
+            {
+                background: rgba(12, 13, 2, 0.38);
+                position: absolute;
+                top: 20%;
+                left: 1%;
+            }
+            g.tick 
+            {
+                fill: rgba(247,238,238,0.8);
+            }
+            
+            text.dimple-axis.dimple-title
+            {
+                fill: rgba(247,238,238,0.8);
+            }
+            
+            line
+            {
+                stroke: black;
+            }
+            
+            table
+            {
+                    background: rgba(245,245,245,0.8);
+                    margin: 20px;
+                    margin-top: 30px;
+                    width:90%;
+            }
+            tbody 
+            {
+                    border-radius: 100px;
+            }
+            tr
+            {
+                    /* padding: 10px; */
+                    border-bottom: solid gray 1px;
+                    font-family: corbel;
+                    /* border-radius: 30px; */
+            }
+            td 
+            {
+                    padding: 15px;
+            }
+            th 
+            {
+                    padding: 15px;
+                    font-family: sans-serif;
+                    font-size: x-large;
+                    color: #286090;
+            }
+      </style>
+  </head>
+<body>
+<nav>
+<ul>
+  <li><a href="basic_charts.html" alt="Home Page">CERN Dashboard</a></li>
+  <li><a href="basic_charts.html" class = "op1">Option 1</a></li>
+  <li><a href="globeStuff.html" class = "op2">Option 2</a></li>
+  <li><a href="movingBars.html" class = "op3">Option 3</a></li>
+  <li><a href="pride.html" class = "op4">Option 4</a></li>
+</ul>
+</nav>
+
+<div class="row">
+  <div class="col-md-12"><h2>VMs Created</h2></div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <script type="text/javascript">
+
+			//Width and height
+			var w = 800;
+			var h = 450;
+			
+			var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
+							11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
+			
+			var xScale = d3.scale.ordinal()
+							.domain(d3.range(dataset.length))
+							.rangeRoundBands([0, w], 0.05);
+
+			var yScale = d3.scale.linear()
+							.domain([0, d3.max(dataset)])
+							.range([0, h]);
+			
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+			//Create bars
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+			   .attr("x", function(d, i) {
+			   		return xScale(i);
+			   })
+			   .attr("y", function(d) {
+			   		return h - yScale(d);
+			   })
+			   .attr("width", xScale.rangeBand()-20)
+			   .attr("height", function(d) {
+			   		return yScale(d);
+			   })
+			   .attr("fill", function(d) {
+                    if (d<12)
+					return "#FF7474";
+                    else if (d>=12 && d<19)
+                    return "#F2C94E";
+                    else
+                    return "#F59B71";
+			   });
+
+			//Create labels
+			svg.selectAll("text")
+			   .data(dataset)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return d;
+			   })
+			   .attr("text-anchor", "middle")
+			   .attr("x", function(d, i) {
+			   		return xScale(i) + xScale.rangeBand() / 2 - 10;
+			   })
+			   .attr("y", function(d) {
+			   		return h - yScale(d) + 14;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "black");
+
+
+
+
+			//On click, update with new data			
+			d3.select("h2")
+				.on("click", function() {
+
+					//New values for dataset
+					//dataset = [ 11, 12, 15, 20, 18, 17, 16, 18, 23, 25,
+						//		5, 10, 13, 19, 21, 25, 22, 18, 15, 13 ];
+                    
+                    var numValues = dataset.length; //Count original length of dataset
+dataset = []; //Initialize empty array
+for (var i = 0; i < numValues; i++) { //Loop numValues times
+var newNumber = Math.floor(Math.random() * 25); //New random integer (0-24)
+dataset.push(newNumber); //Add new number to array
+}
+					//Update all rects
+					svg.selectAll("rect")
+					   .data(dataset)
+                       .transition()
+                       .delay(function(d,i)
+                              {
+                                return 10;
+                              })
+                       .duration(1000)
+                       .ease('cubic-in-out')
+					   .attr("y", function(d) {
+					   		return h - yScale(d);
+					   })
+					   .attr("height", function(d) {
+					   		return yScale(d);
+					   })
+                        .attr("fill", function(d) {
+                    if (d<12)
+					return "#FF7474";
+                    else if (d>=12 && d<19)
+                    return "#F2C94E";
+                    else
+                    return "#F59B71";
+                       });
+                    
+                    svg.selectAll("text")
+                       .data(dataset)
+                       .transition()
+                       .duration(1000)
+                       .text(function(d) {
+                                return d;
+                            }) 
+                       .attr("x", function(d, i) {
+                                return xScale(i) + xScale.rangeBand() / 2 - 10;
+                            })
+                       .attr("y", function(d) {
+                                return h - yScale(d) + 14;
+                        });
+				
+				});
+    </script>
+  </div>
+  <div class="col-md-5">
+    <table>
+        <tr>
+            <th colspan="2">Meyrin Data Center</th>
+        </tr>
+        <tr>
+            <td>Number of Cores in Meyrin</td>
+            <td>146,960</td>
+        </tr>
+         <tr>
+            <td>Number of Drives in Meyrin</td>
+            <td>83,609</td>
+        </tr>
+         <tr>
+            <td>Number of 10G NIC in Meyrin</td>
+            <td>8,845</td>
+        </tr>
+         <tr>
+            <td>Number of 1G NIC in Meyrin</td>
+            <td>22,365</td>
+        </tr>
+         <tr>
+            <td>Number of Processors in Meyrin</td>
+            <td>24,737</td>
+        </tr>
+         <tr>
+            <td>Number of Servers in Meyrin</td>
+            <td>13,170</td>
+        </tr>
+         <tr>
+            <td>Total Disk Space in Meyrin(TB)</td>
+            <td>163,982</td>
+        </tr>
+         <tr>
+            <td>Total Memory Capacity in Meyrin(TB)</td>
+            <td>597</td>
+        </tr>
+    </table>
+  
+  </div>
+</div>
+
+
+</body>
+</html>

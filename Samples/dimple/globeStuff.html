@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <style>
+      circle 
+      {
+        fill: orange;
+        stroke: black;
+        stroke-width: 0.7;
+        opacity: 0.7;
+      }
+      h2
+      {
+        text-align: center;
+      }
+      div.years_buttons
+      {
+        position: fixed;
+        top: 5px;
+        left: 50px;
+      }
+      div.years_buttons div
+      {
+        background-color: rgb(251, 201, 127);
+        padding: 3px;
+        margin: 7px;
+      }
+    
+  </style>
+  <script type="text/javascript">  
+      function draw(geo_data) {
+        "use strict";
+        var margin = 75,
+            width = 800 - margin,
+            height = 600 - margin,
+            start = 1930,
+            end = 2015,
+            step = 4;
+            
+        
+
+        var svg = d3.select('body')
+            .append('svg')
+            .attr('width', width + margin)
+            .attr('height', height + margin)
+            .append('g')
+            .attr('class', 'map');
+            
+        var years = [];
+        for(var year = start; year <= end; year = year + step)
+        {
+            if(year !== 1942 && year != 1946)
+            {
+                years.push(year);
+            }
+        }
+            
+        var projection = d3.geo.mercator()
+                               .scale(140)
+                               .translate([width/2, height/1.2]);
+        
+        var path = d3.geo.path().projection(projection);
+        
+        
+        var map = svg.selectAll('path')
+                     .data(geo_data.features)
+                     .enter()
+                     .append('path')
+                     .attr('d',path)
+                     .style('fill','#EEDA95')
+                     .style('stroke','black')
+                     .style('stroke-width', 0.5);
+        function plot_points(data)
+        {
+            function agg_year(leaves)
+            {
+                var total = d3.sum(leaves, function(d)
+                                          {
+                                            return d['attendance'];
+                                          });
+                var coords = leaves.map(function(d)
+                                       {
+                                            return projection([+d.long, +d.lat]);
+                                       });
+                var center_x = d3.mean(coords, function(d)
+                                               {
+                                                    return d[0];
+                                               });
+                var center_y = d3.mean(coords, function(d)
+                                              {
+                                                    return d[1];
+                                              });
+                var teams = d3.set();
+                leaves.forEach(function(d)
+                               {
+                                    teams.add(d['team1']);
+                                    teams.add(d['team2']);
+                               });
+                               
+                return {
+                  'attendance' : total,
+                    'x' : center_x,
+                    'y' : center_y,
+                    'teams' : teams.values()
+                };
+            }
+            var nested = d3.nest()
+                        .key(function(d)
+                             {
+                                return d['date'].getUTCFullYear();
+                             }
+                            )
+                        .rollup(agg_year)
+                        .entries(data);
+                        
+            var attendance_max = d3.max(nested, function(d) {
+                return d.values['attendance'];
+            });
+            
+            var radius = d3.scale.sqrt()
+                                 .domain([0, attendance_max])
+                                 .range([0,15]);
+                                 
+            function key_func(d)
+            {
+                return d['key'];
+            }
+            
+            svg.append('g')
+               .attr('class','bubble')
+               .selectAll('circle')
+               .data(nested.sort(function(a, b){
+                                    return b.values['attendance'] - a.values['attendance'];
+                                 }), key_func
+                                )
+               .enter()
+               .append('circle')
+               .attr('cx', function(d)
+                           {
+                                return(d.values['x']);
+                           })
+               .attr('cy', function(d)
+                           {
+                                return(d.values['y']);
+                           })
+                .attr('r',function(d)
+                          {
+                                return radius(d.values['attendance']);
+                          })
+                .attr('fill', '#C75233')
+                .attr('stroke','black')
+                .attr('stroke-width', 0.7)
+                .attr('opacity', 0.7);
+          
+        
+        
+            function update(year) 
+            {
+                var filtered = nested.filter(function(d) {
+                return new Date(d['key']).getUTCFullYear() === year;
+                });
+                
+                
+            
+                var circles = svg.selectAll('circle')
+                                 .data(filtered, key_func);
+                                 
+                circles.exit().remove();
+                
+                circles.enter()
+                       .append('circle')
+                       .transition()
+                       .duration(500)
+                       .attr('cx', function(d){return d.values['x'];})
+                       .attr('cy', function(d){return d.values['y'];})
+                       .attr('r', function(d){return radius(d.values['attendance']);});
+                       
+                var countries  =  filtered[0].values['teams'];
+                
+                function update_countries(d)
+                {
+                    if(countries.indexOf(d.properties.name) !== -1)
+                                    {
+                                        return "rgba(255,0,91,0.7)";
+                                    }
+                                    else
+                                    {
+                                        return "rgba(252,252,215,0.8)";
+                                    }  
+                }
+                svg.selectAll('path')
+                   .transition()
+                   .duration(500)
+                   .style('fill', update_countries)
+                   .style('stroke', "#DFBA69");
+
+            }
+                        
+            var year_index = 0;
+            var year_interval = setInterval(function()
+                                            {
+                                                update(years[year_index]);
+                                                year_index++;
+                                                if(year_index >= years.length)
+                                                {
+                                                    clearInterval(year_interval);
+                                                    
+                                                    /*var buttons = d3.select('body')
+                                                                    .append('div')
+                                                                    .attr('class', 'years_buttons')
+                                                                    .selectAll('div')
+                                                                    .data(years)
+                                                                    .enter()
+                                                                    .append('div')
+                                                                    .text(function(d)
+                                                                    {
+                                                                        return(d);
+                                                                    }
+                                                                    );
+                                                                    
+                                                    buttons.on('click',function(d)
+                                                                       {
+                                                                            d3.select('.years_buttons')
+                                                                              .selectAll('div')
+                                                                              .transition()
+                                                                              .duration(500)
+                                                                              .style('background', 'rgb(251, 201, 127)')
+                                                                              .style('color','black');
+                                                                              
+                                                                            d3.select(this)
+                                                                              .transition()
+                                                                              .duration(500)
+                                                                              .style('background', 'lightBlue')
+                                                                              .style('color','white');
+                                                                              
+                                                                            update(d);
+                                                                       });*/
+                                                }
+                                            },1000);
+        }
+        
+        var format = d3.time.format("%d-%m-%Y (%H:%M h)");
+        d3.tsv("world_cup_geo.tsv",function(d)
+          {d['date'] = format.parse(d['date']);
+           d['attendance'] = +d['attendance'];
+           return d;                                                                                                                                                                                                                                                                                                                                                                                         
+          }, plot_points);
+       
+       };
+      </script>
+      <link rel="stylesheet" type="text/css" href="../../css/defaultCSS.css">
+      <style>
+            body
+{
+    background: url("../../imgs/Backdrop.png") no-repeat center center fixed;<!--Make a seperate images folder-->
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+nav
+{
+    font-family: calibri;
+    font-size: 1.50em;
+    color: #FFFFFF;
+    background-color: rgba(12, 13, 2, 0.7);
+    
+    box-sizing: border-box;
+    padding:10px;
+     
+}
+
+ul
+{
+    list-style-type: none;
+     padding: 8px 16px;
+}
+
+li
+{
+    display: inline;
+   
+}
+
+li a 
+{
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+a:hover
+{
+    text-decoration:none;
+    color: #ffffff;
+}
+a.op1
+{
+    border-bottom: 2px solid #2FB8AC;
+}
+
+a:hover.op1
+{
+    background: #2FB8AC;
+}
+
+a:active.op1
+{
+    background: #2FB8AC;
+}
+
+a.op2
+{
+    background: #B05574;
+    border-bottom: 2px solid #B05574;
+}
+
+a:hover.op2
+{
+    background: #B05574;
+}
+
+a.op3
+{
+    border-bottom: 2px solid #FD0A54;
+}
+
+a:hover.op3
+{
+    background: #FD0A54;
+}
+
+a.op4
+{
+    border-bottom: 2px solid #F57576;
+}
+
+a:hover.op4
+{
+    background: #F57576;
+}
+            
+             h2
+            {
+                    text-align: center;
+                    font-size: 1.50em;
+                    color: #d9edf7;
+                    padding: 20px;
+                    font-family: sans-serif;
+            }
+            
+            svg
+            {
+                background: rgba(12, 13, 2, 0.38);
+                position: absolute;
+                top: 20%;
+                left: 1%;
+            }
+            
+            
+            table
+            {
+                    background: rgba(245,245,245,0.8);
+                    margin: 20px;
+                    margin-top: 0px;
+                    width:90%;
+            }
+            tbody 
+            {
+                    border-radius: 100px;
+            }
+            tr
+            {
+                    /* padding: 10px; */
+                    border-bottom: solid gray 1px;
+                    font-family: corbel;
+                    /* border-radius: 30px; */
+            }
+            td 
+            {
+                    padding: 15px;
+            }
+            th 
+            {
+                    padding: 15px;
+                    font-family: sans-serif;
+                    font-size: x-large;
+                    color: #286090;
+            }
+      </style>
+      </head>
+<body>
+<nav>
+  <ul>
+  <li><a href="basic_charts.html" alt="Home Page">CERN Dashboard</a></li>
+  <li><a href="basic_charts.html" class = "op1">Option 1</a></li>
+  <li><a href="globeStuff.html" class = "op2">Option 2</a></li>
+  <li><a href="movingBars.html" class = "op3">Option 3</a></li>
+  <li><a href="pride.html" class = "op4">Option 4</a></li>
+</ul>
+</nav>
+
+<div class="row">
+  <div class="col-md-12"><h2>Datacenters</h2></div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+  <script type="text/javascript">
+    d3.json("world_countries.json", draw);
+  </script>
+  </div>
+  <div class="col-md-5">
+    <table>
+        <tr>
+            <th colspan="2">Data Centers</th>
+        </tr>
+        <tr>
+            <td>Number of Cores in Meyrin</td>
+            <td>146,960</td>
+        </tr>
+         <tr>
+            <td>Number of Drives in Meyrin</td>
+            <td>83,609</td>
+        </tr>
+         <tr>
+            <td>Number of 10G NIC in Meyrin</td>
+            <td>8,845</td>
+        </tr>
+         <tr>
+            <td>Number of 1G NIC in Meyrin</td>
+            <td>22,365</td>
+        </tr>
+         <tr>
+            <td>Number of Processors in Meyrin</td>
+            <td>24,737</td>
+        </tr>
+         <tr>
+            <td>Number of Servers in Meyrin</td>
+            <td>13,170</td>
+        </tr>
+         <tr>
+            <td>Total Disk Space in Meyrin(TB)</td>
+            <td>163,982</td>
+        </tr>
+         <tr>
+            <td>Total Memory Capacity in Meyrin(TB)</td>
+            <td>597</td>
+        </tr>
+    </table>
+  
+  </div>
+</div>
+</body>
+</html>

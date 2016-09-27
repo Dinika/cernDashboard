@@ -1,0 +1,5 @@
+body > svg {
+  position: absolute;
+  top: -80px;
+  left: -160px;
+}

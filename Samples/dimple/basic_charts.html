@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  
+    <script type="text/javascript">
+      function draw(data) {
+      
+      /*
+        D3.js setup code
+      */
+
+          "use strict";
+          var margin = 75,
+              width = 800 - margin,
+              height = 500 - margin;
+        
+         
+         
+          var svg = d3.select("body")
+            .append("svg")
+              .attr("width", width + margin)
+              .attr("height", height + margin)
+              .append('g')
+                .attr('class','chart');
+
+      /*
+        Dimple.js Chart construction code
+      */
+
+          var myChart = new dimple.chart(svg, data);
+          
+          myChart.defaultColors = [
+                new dimple.color("#4ECDC4"),
+                new dimple.color("#F4DD51"), // Set a red fill with a blue stroke
+                new dimple.color("#C7F464"), // Set a green fill with a darker green stroke
+                new dimple.color("#FF6B6B"),
+                new dimple.color("#C44D58")// Set a blue fill with a darker blue stroke
+                ];
+                
+          var x = myChart.addTimeAxis("x", "year"); 
+          myChart.addMeasureAxis("y", "attendance");
+          x.dateParseFormat = "%Y";
+          x.tickFormat = "%Y";
+          x.timeInterval = 4;
+          myChart.addSeries("stage", dimple.plot.bar);
+          myChart.addSeries(null, dimple.plot.line);
+          myChart.draw();
+        };
+        
+      </script>
+      <link rel="stylesheet" type="text/css" href="../../css/defaultCSS.css">
+      <style>
+            body
+{
+    background: url("../../imgs/Backdrop.png") no-repeat center center fixed;<!--Make a seperate images folder-->
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+nav
+{
+    font-family: calibri;
+    font-size: 1.50em;
+    color: #FFFFFF;
+    background-color: rgba(12, 13, 2, 0.7);
+    
+    box-sizing: border-box;
+    padding:10px;
+     
+}
+
+ul
+{
+    list-style-type: none;
+     padding: 8px 16px;
+}
+
+li
+{
+    display: inline;
+   
+}
+
+li a 
+{
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+a:hover
+{
+    text-decoration:none;
+    color: #ffffff;
+}
+a.op1
+{
+    background: #2FB8AC;
+    border-bottom: 2px solid #2FB8AC;
+}
+
+a:hover.op1
+{
+    background: #2FB8AC;
+}
+
+a:active.op1
+{
+    background: #2FB8AC;
+}
+
+a.op2
+{
+    border-bottom: 2px solid #B05574;
+}
+
+a:hover.op2
+{
+    background: #B05574;
+}
+
+a.op3
+{
+    border-bottom: 2px solid #FD0A54;
+}
+
+a:hover.op3
+{
+    background: #FD0A54;
+}
+
+a.op4
+{
+    border-bottom: 2px solid #F57576;
+}
+
+a:hover.op4
+{
+    background: #F57576;
+}
+            h2
+            {
+                    text-align: center;
+                    font-size: 1.25em;
+                    color: #d9edf7;
+                    padding: 20px;
+                    font-family: sans-serif;
+            }
+            path.dimple-line
+            {
+                stroke: #ddd;
+            }
+            svg
+            {
+                background: rgba(12, 13, 2, 0.38);
+                position: absolute;
+                top: 20%;
+                left: 1%;
+            }
+            g.tick 
+            {
+                fill: rgba(247,238,238,0.8);
+            }
+            
+            text.dimple-axis.dimple-title
+            {
+                fill: rgba(247,238,238,0.8);
+            }
+            
+            line
+            {
+                stroke: black;
+            }
+            
+            table
+            {
+                    background: rgba(245,245,245,0.8);
+                    margin: 20px;
+                    margin-top: 30px;
+                    width:90%;
+            }
+            tbody 
+            {
+                    border-radius: 100px;
+            }
+            tr
+            {
+                    /* padding: 10px; */
+                    border-bottom: solid gray 1px;
+                    font-family: corbel;
+                    /* border-radius: 30px; */
+            }
+            td 
+            {
+                    padding: 15px;
+            }
+            th 
+            {
+                    padding: 15px;
+                    font-family: sans-serif;
+                    font-size: x-large;
+                    color: #286090;
+            }
+      </style>
+  </head>
+<body>
+<nav>
+  <ul>
+  <li><a href="basic_charts.html" alt="Home Page">CERN Dashboard</a></li>
+  <li><a href="basic_charts.html" class = "op1" >Option 1</a></li>
+  <li><a href="globeStuff.html" class = "op2">Option 2</a></li>
+  <li><a href="movingBars.html" class = "op3">Option 3</a></li>
+  <li><a href="pride.html" class = "op4">Option 4</a></li>
+</ul>
+</nav>
+<div class="row">
+  <div class="col-md-12"><h2>Data Transaction per Second</h2></div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <script type="text/javascript">
+  /*
+    Use D3 (not dimple.js) to load the TSV file
+    and pass the contents of it to the draw function
+    */
+    d3.tsv("world_cup.tsv", draw);
+  </script>
+  </div>
+  <div class="col-md-5">
+    <table>
+        <tr>
+            <th colspan="2">Meyrin Data Center</th>
+        </tr>
+        <tr>
+            <td>Number of Cores in Meyrin</td>
+            <td>146,960</td>
+        </tr>
+         <tr>
+            <td>Number of Drives in Meyrin</td>
+            <td>83,609</td>
+        </tr>
+         <tr>
+            <td>Number of 10G NIC in Meyrin</td>
+            <td>8,845</td>
+        </tr>
+         <tr>
+            <td>Number of 1G NIC in Meyrin</td>
+            <td>22,365</td>
+        </tr>
+         <tr>
+            <td>Number of Processors in Meyrin</td>
+            <td>24,737</td>
+        </tr>
+         <tr>
+            <td>Number of Servers in Meyrin</td>
+            <td>13,170</td>
+        </tr>
+         <tr>
+            <td>Total Disk Space in Meyrin(TB)</td>
+            <td>163,982</td>
+        </tr>
+         <tr>
+            <td>Total Memory Capacity in Meyrin(TB)</td>
+            <td>597</td>
+        </tr>
+    </table>
+  
+  </div>
+</div>
+
+
+</body>
+</html>

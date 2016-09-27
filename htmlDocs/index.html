@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CERN Dashboard</title>
+<link rel="icon" 
+      type="image/png" 
+      href="../imgs/cernLogo.png">
+<link href='https://fonts.googleapis.com/css?family=PT+Sans+Caption' rel='stylesheet' type='text/css'>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="../js/d3.hexbin.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/defaultCSS.css">
+<style>
+body
+{
+    background: url("../imgs/Backdrop.png") no-repeat center center fixed;<!--Make a seperate images folder-->
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+nav
+{
+    font-family: calibri;
+    font-size: 1.50em;
+    color: #FFFFFF;
+    background-color: rgba(12, 13, 2, 0.7);
+    
+    box-sizing: border-box;
+    padding:10px;
+     
+}
+
+ul
+{
+    list-style-type: none;
+     padding: 8px 16px;
+}
+
+li
+{
+    display: inline;
+   
+}
+
+li a 
+{
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+a.op1
+{
+    
+    border-bottom: 2px solid #2FB8AC;
+}
+
+a:hover.op1
+{
+    background: #2FB8AC;
+}
+
+a:active.op1
+{
+    background: #2FB8AC;
+}
+
+
+a.op2
+{
+    border-bottom: 2px solid #B05574;
+}
+
+a:hover.op2
+{
+    background: #B05574;
+}
+
+a.op3
+{
+    
+    border-bottom: 2px solid #FD0A54;
+}
+
+a:hover.op3
+{
+    background: #FD0A54;
+}
+
+a.op4
+{
+    border-bottom: 2px solid #F57576;
+}
+
+a:hover.op4
+{
+    background: #F57576;
+}
+
+.leftBar
+{
+    display: inline-block;
+    vertical-align: top;
+}
+
+div.totalVM
+{
+    display: inline-block;
+    font-size: 70px;
+    font-family: corbel;
+    color: rgb(181,202,237);
+    padding-left:10px;
+    text-align: center;
+}
+
+div.totalVM > div.text
+{
+    font-size:20px;
+    text-align:center;
+    margin-top: 10px;
+    color: rgb(217, 217, 217);
+    padding-bottom: 5px; 
+    border-bottom: 1px solid white;
+}
+
+.rightBar
+{
+    position: absolute;
+    top: 10%;
+    right: 0%;
+}
+
+/*table.table1
+{
+    height: 350px;
+    width: 350px;
+    overflow-y:scroll;
+    overflow-x:scroll;
+    background: rgba(12, 13, 2, 0.6);
+    border-radius: 8px;
+    padding-right: 0px;
+    display:block;
+}
+
+table.table1 tbody, table.table1 tr {
+    display: block;
+    width: 100%;
+}
+
+table.table1 tr {
+    border-bottom: 1px solid #0CA5B0;
+}
+
+.table1 th
+{
+    padding: 10px;
+    font-size: 35px;
+    color: rgb(181,202,237);
+    font-family: calibri;
+    text-align: -webkit-left;
+}
+
+.table1 td
+{
+    font-size: 24px;
+    color: rgb(195, 195, 195);
+    font-family: calibri light;
+    padding:10px;
+}
+
+table.table1 tr.no-line {
+    border-bottom: none;
+}
+
+.table1 td
+{
+   
+    width: 85px;
+}
+
+table.table1 td {
+   
+    display: table-cell;
+    width: 100%;
+}
+*/
+table.table1
+{
+    background: rgba(12, 13, 2, 0.6);
+    border-radius: 8px;
+    width:100%;
+    height: 20em;
+}
+
+.table1 td
+{
+    padding: 10px;
+}
+
+table.table1 tr 
+{
+    border-bottom: 1px solid #0CA5B0;
+}
+
+.table1 th
+{
+    padding: 10px;
+    font-size: 35px;
+    color: rgb(181,202,237);
+    font-family: calibri;
+    
+}
+
+.table1 td
+{
+    font-size: 24px;
+    color: rgb(195, 195, 195);
+    font-family: calibri light;
+    padding:10px;
+}
+
+.table1 tr.no-line {
+    border-bottom: none;
+    text-align: -webkit-left;
+}
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar:horizontal {
+    width: 4px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    background-color: #152B3C;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    background-color: #9D9E94;
+}
+
+::-webkit-scrollbar-corner       
+{
+    background-color: #152B3C;
+}
+.table2
+{
+    width: 22em;
+    height: 10em;
+    overflow: scroll;
+    padding-right: 0px;
+}
+
+.table2 th
+{
+    background: rgba(12, 13, 2, 0.6);
+    padding: 10px;
+    font-size: 35px;
+    color: rgb(181,202,237);
+    font-family: calibri;
+    border-radius: 8px;
+    text-align: -webkit-left;
+}
+
+.table2 td
+{
+    background: rgba(12, 13, 2, 0.6);
+    font-size: 24px;
+    color: rgb(195, 195, 195);
+    font-family: calibri light;
+    padding:10px;
+}
+
+.dataTable tr,td
+{
+    /* border-bottom: 1px solid #0CA5B0; */
+}
+
+td.tickets
+{
+    font-size: 90px;
+    color: #FFFFFF, #00A8C6;
+    vertical-align: top;
+}
+
+div.ticketsCaption
+{
+    font-size: 20px;
+    color: #FD0A54;
+}
+
+svg.mainGraph
+{
+    display: inline-block;
+    position: fixed;
+    left: 20%;
+    top: 12%;
+}
+
+circle.circles
+{
+  background: red; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, red, yellow); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, red, yellow); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, red, yellow); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, red, yellow); /* Standard syntax */
+}
+
+.graphContainer
+{
+    position: absolute;
+    top: 20%;
+    left: 14%;
+    width: 800px;
+    height: 750px;
+    overflow: scroll;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+}
+
+.d3-tip
+{
+    background: rgba(0,0,0,0.95);
+    opacity: 0.6;
+    color: #FF003D;
+    font-family: corbel;
+    padding: 5px;
+}
+
+div.topBox
+{
+    display: inline-block;
+    padding: 20px;
+    position: absolute;
+    left: 25%;
+    font-family: 'PT Sans', sans-serif;
+}
+
+div.zoomTransition
+{
+    display: inline-block;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 1.15em;
+    border: solid #00a8c6 1px;
+    border-radius: 20px;
+    background: #0ca5b0;
+    color: white;
+    margin-left: 30px;
+    margin-bottom: 60px;
+    width: 180px;
+    height: 22px;
+}
+
+div.zoomTransition:hover
+{
+    background: white;
+    border: solid white 1px; 
+    color: #3ab9e4;
+    font-weight: 600;
+    font-size: 1em;
+}
+
+div.searchBox
+{
+    display: inline-block;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 1.25em;
+    border: solid rgb(217, 217, 217) 2px;
+    border-radius: 20px;
+    background: rgba(217,217,217,0.3);
+    color: white;
+    margin-right: 30px;
+    margin-bottom: 60px;
+    width: 180px;
+    height: 22px;
+}
+
+.legend
+{
+    background: rgba(12, 13, 2, 0.6);
+    display: inline-block;
+    padding-right:20px;
+    padding-bottom: 20px;
+    width: 100px;
+    font-family: 'PT Sans Caption', sans-serif;
+}
+
+.okayNode
+{
+         box-shadow: 120px 80px 40px 20px #0ff;        
+}
+
+
+</style>
+</head>
+<body>
+<nav>
+  <ul>
+  
+  <li><a href="../Samples/dimple/basic_charts.html" alt="Home Page">CERN Dashboard</a></li>
+  <li><a href="../Samples/dimple/basic_charts.html" class = "op1" >Option 1</a></li>
+  <li><a href="../Samples/dimple/globeStuff.html" class = "op2">Option 2</a></li>
+  <li><a href="../Samples/dimple/movingBars.html" class = "op3">Option 3</a></li>
+  <li><a href="../Samples/dimple/pride.html" class = "op4">Option 4</a></li>
+</ul>
+</nav>
+
+<table class="leftBar">
+<tr><td>
+<div class="totalVM">
+25000 <!--Correct this-->
+    <div class="text">Total VMS</div>
+</div>
+</td></tr>
+
+<tr><td>
+<div class="totalVM">
+44 <!--Correct this-->
+    <div class="text">Total Cells</div>
+</div>
+</td></tr>
+</table>
+
+<div class="topBox">
+                <div class="searchBox" style="display: inline-block;">
+                    Search
+                </div>
+                <div class="zoomTransition"  style="display: inline-block;">
+                    Zoom into Faulty VMs
+                </div>
+</div>
+<br>
+<br>
+<main class="content">
+		<div class="container">
+			<div class="row">
+				<div class=col-lg-6">
+                
+                	<section class="content-inner margin-top-no">
+						<div class="card">
+							<div class="card-main">
+                            
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="/js/display.js"></script>
+							</div>
+						</div>
+					</section>
+				</div>
+                <div class=col-lg-6"></div>
+			</div>
+		</div>
+	</main>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="js/base.min.js"></script>
+	<script src="js/project.min.js"></script>
+    
+<div class="rightBar" style = "border-bottom: 1px solid #0CA5B0;">
+<div class="stars" style="overflow-x:scroll; overflow-y:scroll; height: 20em; width: 100%">
+<table class = "table1">
+    <tbody>
+    <tr class="noLine" style="text-align: -webkit-left; border-bottom: none;"><th colspan = "2" >Some data here</th></tr>
+                <tr><td>Name</td></td><td class="cellName"></td></tr>
+                <tr><td>Status</td><td class="cellStatus"></td></tr>
+                <tr><td>VM State</td><td class="vmState"></td></tr>
+                <tr><td>Task State</td><td class="taskState"></td></tr>
+                <tr><td>User ID</td><td class="userID"></td></tr>
+                <tr><td>uuid</td><td class="uuID"></td></tr>
+                <tr><td>Availability Zone</td><td class="availablityZone"></td></tr>
+                <tr><td>Cell Name</td><td class="cellName"></td></tr>
+                <tr><td>Access IPv4</td><td class="accessIPv4"></td></tr>
+                <tr><td>Host</td><td class="host"></td></tr>
+                <tr><td>Memory (MB)</td><td class="memory"></td></tr>
+                <tr><td>vcpus</td><td class="vcpus"></td></tr>
+                <tr><td>Image Reference</td><td class="imageRef"></td></tr>
+                <tr><td>Power State</td><td class="powerState"></td></tr>
+                <tr><td>Display Name</td><td class="displayName"></td></tr>
+                <tr><td>Project ID</td><td class="projectID"></td></tr>
+                <tr><td>Access IPv6</td><td class="accessIPv6"></td></tr>
+    </tbody>
+</table>
+</div>
+</br>
+
+<table class = "table2" class = "dataTable">
+  <tr><th colspan = "3" >Summary</th></tr>
+
+   <tr>
+   <td rowspan="3" class = "tickets" style="text-align:center;">2</br><div class="ticketsCaption">Faulty VMS</div></td>
+    <td><img src = "../imgs/graph.png" width="200px" alt = "graph picture"></td>
+   </tr>
+   
+   <tr>
+      <td>some data</td>
+  </tr>
+   <tr>
+      <td>even more data</td>
+  </tr>
+</table>
+</div>
+
+</br>
+</br>
+<div class="legend" style="color: white">
+<table>
+    <tr>
+        <td>
+            <svg  height="58" width="50">
+                <circle cx="30" cy="47" r="9" stroke="#7F9CA0" stroke-width="2" fill="rgba(207,255,221,0.6)" />
+            </svg>
+        </td>
+        <td>
+            Okay
+        </td>
+    </tr>
+    <tr>
+        <td>
+             <svg  height="58" width="50">
+                <circle cx="30" cy="47" r="9" stroke="rgb(247,143,30)" stroke-width="1.5" fill="rgba(255,170,0,0.8)" />
+            </svg>
+        </td>
+        <td>
+            Warning
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <svg  height="58" width="50">
+                <circle cx="30" cy="47" r="9" stroke="#EB0A44" stroke-width="1.5" fill="rgba(255,0,91,0.7)" />
+            </svg>
+        </td>
+        <td>
+            Error!
+        </td>
+    </tr>
+</table>
+</div>
+
+
+<!--<svg width="600" height="500" class = "mainGraph">
+<defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="80%" y2="90%">
+      <stop offset="0%" style="stop-color:#F6AA93;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#A5B3AA;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+<circle class = "circles" cx="300" cy="300" r="200" fill="url(#grad1)" stroke="#0CA5B0" stroke-width="1"/>
+<text fill="rgb(181,202,237)" font-size="45" font-family="calibri light" x="250" y="300">
+  CERN</text>
+</svg>-->
+
+<script type="text/javascript">
+    /* var width = 1000,
+        height = 1000,
+        bPadding = 5;
+        
+    var svg = d3.select('body')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+                
+    var circles = svg.selectAll('circle')
+                     .enter()
+                     .append('circle')
+                     .attr('class','circles');
+                     
+    circles.attr('cx', '1000px')
+           .attr('cy', '1000px')
+           .attr('r', 50)
+           .attr('fill', 'teal')
+           .attr('stroke', 'lightBlue');*/
+           
+
+</script>
+</body>
+</html>

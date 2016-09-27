@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+<style>
+    circle.cirlcles
+    {
+        fill: teal;
+        margin-right: 5px;
+    }
+    
+    .axis path,
+    .axis line 
+    {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    } 
+    
+    .axis text 
+    {
+        font-family: sans-serif;
+        font-size: 11px;
+        fill: olive;
+    }
+</style>
+</head>
+<body>
+<p><a href="secondPage.html">Click on this text to update the chart with new data values (once).</a></p>
+<script type="text/javascript">
+// Your beautiful D3 code will go here
+    //var data = [[5, 20], [480, 90], [600, 150], [250, 50], [100, 33], [330, 95], [410, 12], [475, 44], [25, 67], [85, 21], [220, 88]];
+    var data = [];
+    var numDataPoints = 50;
+    var xRange = Math.random() * 1000;
+    var yRange = Math.random() * 1000;
+    for (var i = 0; i < numDataPoints; i++) 
+    {
+        var newNumber1 = Math.floor(Math.random() * xRange);
+        var newNumber2 = Math.floor(Math.random() * yRange);
+        data.push([newNumber1, newNumber2]);
+    }
+    var data2 =  [ 100, 200, 300, 400, 500 ];
+    var width = 500,
+        height = 300,
+        bPadding = 5,
+        padding = 30;
+    var svg = d3.select('body')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+                
+    var xscale = d3.scale.linear()
+                   .domain([0, d3.max(data, function(d) { return d[0]; })])
+                   .range([padding, width - padding*2]);
+                  
+    var yscale = d3.scale.linear()
+                   .domain([0, d3.max(data, function(d) { return d[1]; })])
+                   .range([height-padding, padding]);
+                   
+    var rscale = d3.scale.linear()
+                   .domain([0, d3.max(data, function(d) { return (d[1]); })])
+                   .range([2, 5]);
+                   
+                   
+                
+    var circles = svg.selectAll('circle')
+                     .data(data)
+                     .enter()
+                     .append('circle')
+                     .attr('class','circles');
+                  
+    circles.attr('cx', function(d)
+                       {
+                            return xscale(d[0]);
+                       })
+           .attr('cy',function(d)
+                     {
+                        return yscale(d[1]);
+                     })
+           .attr('r', function(d)
+                      {
+                        return rscale(d[1]);
+                      })
+           .attr('fill', 'teal')
+           .attr('stroke', 'lightBlue');
+        
+    var labels = svg.selectAll('text')
+                    .data(data)
+                    .enter()
+                    .append('text')
+                    .text(function(d)
+                          {
+                            return (d[0] + ',' + d[1]);
+                          })
+                    .attr('text-anchor', 'middle')
+                    .attr("x", function(d) {return xscale(d[0]);})
+                    .attr("y", function(d) {return yscale(d[1]);})
+                    .attr('font-family', 'sans-serif')
+                    .attr('font-size', '11px')
+                    .attr('fill', 'black');
+                    
+     var xAxis = d3.svg.axis()
+                  .scale(xscale)
+                  .orient('bottom')
+                  .ticks(5);
+                  
+    svg.append('g')
+       .attr('class','axis')
+       .attr('transform', 'translate(0,' + (height - padding) + ')')
+       .call(xAxis);
+       
+    var yAxis =d3.svg.axis()
+                 .scale(yscale)
+                 .orient('left')
+                 .ticks(5);
+                 
+    svg.append('g')
+       .attr('class','axis')
+       .attr('transform','translate('+padding+',0)')
+       .call(yAxis);
+       
+    d3.select("p")
+      .on("click", function() {
+      //Do something mundane and annoying on click
+      alert("Hey, don't click that!");
+     });
+ 
+</script>
+</body>
+</html>
