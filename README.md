@@ -59,6 +59,13 @@ Bugs/Issues that need to be fixed
 
 7. This is more of a reminder to myself. I have to add comments in my code.
 
+8. Resolve the JavaScript errors that appear on the console.
+
+9. Change the favicon.
+
+10. Change the Search div into a textBox and the 'Zoom into Faulty VM' div into a button.
+
+11. Add functionality to the search button.
 I won't be surprised if somebody finds bugs that are not listed above. These are just the ones that I can think of right now. 
 
 
