@@ -25,4 +25,9 @@ Bugs/Issues that need to be fixed
 
 11. Add functionality to the search button.
 
+12. Keep one of the three display.js files:
+->display.js
+->js/display.js
+->js/display1.js
+
 I won't be surprised if somebody finds bugs that are not listed above. These are just the ones that I can think of right now. 
