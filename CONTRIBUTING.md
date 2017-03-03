@@ -25,4 +25,6 @@ Bugs/Issues that need to be fixed
 
 11. Add functionality to the search button.
 
+12. There are three display.js files in the repository. Two under the js directory and one other in the home directory. Find out the one that is indeed used and remove the others.
+
 I won't be surprised if somebody finds bugs that are not listed above. These are just the ones that I can think of right now. 
